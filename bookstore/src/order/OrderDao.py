@@ -29,6 +29,7 @@ class OrderDao(DataAccessor):
                      " (order_id , isbn, copies_ordered)"
                      " values({}, '{}',{})").format(
                          self.order_id, item['book']['isbn'], available)
+                         self.order_id, isbn, available)
             try:
                 super(OrderDao, self).read(query=query)
             except pymysql.err.IntegrityError as e:
@@ -48,11 +49,13 @@ class OrderDao(DataAccessor):
 
     def insert_into_order(self, timestamp=None):
         current_dt = datetime.datetime.now()
+        current_dt = datetime.datetime.utcnow()
 
         query = ("insert into orders"
                  " (timestamp, login_id, status)"
                  " values ('{}','{}', '{}')").format(
                      current_dt, userid, "Payment Pending")
+                     current_dt, userid, "Order Processing")
 
         super(OrderDao, self).read(query=query)
 
