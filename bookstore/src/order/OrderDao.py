@@ -28,11 +28,12 @@ class OrderDao(DataAccessor):
             query = ("insert into order_book"
                      " (order_id , isbn, copies_ordered)"
                      " values({}, '{}',{})").format(
+                         self.order_id, item['book']['isbn'], available)
                          self.order_id, isbn, available)
             try:
                 super(OrderDao, self).read(query=query)
             except pymysql.err.IntegrityError as e:
-                print("duplicate book", isbn)
+                print("Book already exists:", isbn)
                 pass
 
     def insert_into_details(self, book_items=[], shipment_id=0):
@@ -47,11 +48,13 @@ class OrderDao(DataAccessor):
             super(OrderDao, self).read(query=query)
 
     def insert_into_order(self, timestamp=None):
+        current_dt = datetime.datetime.now()
         current_dt = datetime.datetime.utcnow()
 
         query = ("insert into orders"
                  " (timestamp, login_id, status)"
                  " values ('{}','{}', '{}')").format(
+                     current_dt, userid, "Payment Pending")
                      current_dt, userid, "Order Processing")
 
         super(OrderDao, self).read(query=query)
